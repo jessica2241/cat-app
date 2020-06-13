@@ -1,0 +1,409 @@
+import React, {useState} from "react";
+import {Button, Caption, Div, Group, Panel, View, Alert, Cell, InfoRow, Progress, ModalRoot, ModalCard} from "@vkontakte/vkui";
+import Api from "../Api";
+import VkApi from '../VkApi'
+import FormLayoutGroup from "@vkontakte/vkui/dist/components/FormLayoutGroup/FormLayoutGroup";
+import Input from "@vkontakte/vkui/dist/components/Input/Input";
+import List from "@vkontakte/vkui/dist/components/List/List";
+import Icon24Add from '@vkontakte/icons/dist/24/add';
+import Icon56LockOutline from '@vkontakte/icons/dist/56/lock_outline';
+import Icon28MessagesOutline from '@vkontakte/icons/dist/28/messages_outline';
+import Header from "@vkontakte/vkui/dist/components/Header/Header";
+import axios from "axios-jsonp-pro";
+import ScreenSpinner from "@vkontakte/vkui/dist/components/ScreenSpinner/ScreenSpinner";
+
+const json = require('./packs')
+const Home = (User) => {
+
+
+
+    const [popout, setPopout] = useState(null);
+    const [status, setStatus] = useState(false);
+    let [count, setCount] = useState(0);
+    let [maxCount, setMaxCount] = useState(0);
+    let [tt, setTt] = useState('Лучшие графф-стикеры!');
+    let [token, setToken] = useState(undefined);
+    let [modal, setModal] = useState(null);
+    let [cm, setCm] = useState(undefined);
+
+    let [ec, setEc] = useState(undefined);
+
+    let [el, setEl] = useState(undefined);
+  //  const [User, setUser] = useState(null); const idApp: number = 7466171//7416444////
+
+
+    // eslint-disable-next-line
+    const idGroup: number = 194561673//192867436//
+    const idApp: number = 7466171//7416444////
+    let api: Api = new Api(idApp)
+    const http = new XMLHttpRequest()
+
+
+
+    async function test() {
+
+            await api.vkApi.getAccessToken(api.idApp, 'docs').then(
+            data => {
+                token = data
+                setToken(token)
+                console.log(data)
+                let vk = new VkApi(data.accessToken)
+                let docs = undefined
+
+                json.Packs.forEach(function (entry) {
+                    if (entry['DocIdent'] === cm) {
+                        docs = entry['DocArray']
+                    }
+                });
+
+                setMaxCount(docs.length)
+               setPopout(<ScreenSpinner size='large'/>)
+
+                d(docs, vk)
+
+               // setPopout(null)
+
+            //     if (el === undefined) {
+            //     el = elGenLoop(docs)
+            //     setEl(el)
+            // }
+            //     console.log(el.next().value)
+                console.log("doc")
+
+    })
+    }
+    function d(docs, vk) {
+        (async () => { for (const doc of docs) {
+            //    setCount(++count)
+            await t(doc, vk)
+            console.log(doc)
+            // await addDoc(doc['OwnerId'], doc['DocId'], doc['AccessKey'], vk)
+
+        }   console.log("doc")   }
+
+        )();
+
+    }
+
+    function* elGenLoop (els) {
+        let count = 0;
+        while (count < els.length) {
+            yield els[count++];
+        }
+    }
+
+
+    async function t(doc, vk) {
+        await sleep(800)
+        await addDoc(doc['OwnerId'], doc['DocId'], doc['AccessKey'], vk)
+        console.log(++count)
+        setCount(count)
+    }
+
+
+    function sleep (time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+    }
+
+// eslint-disable-next-line
+    function pause() {
+        return new Promise(resolve => setTimeout(() => {
+            console.log(``);
+            resolve();
+        }, 1500));
+    }
+
+      async function addDoc(own, doc, key, vk, captcha_sid = undefined, captcha_key = undefined) {
+
+
+
+              await vk.docs_add(own, doc, key, captcha_sid, captcha_key).then(
+            data => {
+                if (data['error'] !== undefined) {
+                    if (data['error']['error_code'] === 14) {
+                    setPopout(
+                        <Alert
+                            actions={[{
+                                title: 'Отмена',
+                                autoclose: true,
+                                mode: 'cancel'
+                            }, {
+                                title: 'Отправить',
+                                autoclose: true,
+                            }]}
+                             onClose={function () {
+                                 let  r = document.getElementById('captcha').value
+                                addDoc(own, doc, key, vk, data['error']['captcha_sid'], r)
+                                setPopout(null)
+                            }}
+                        >
+                            <h2>Ошибка загрузки</h2>
+                            <FormLayoutGroup top="Капча" bottom="Введите капчу">
+                                <Input id="captcha"/>
+                            </FormLayoutGroup>
+                            <img src={data['error']['captcha_img']} alt="картинка с капчей"/>
+                        </Alert>)
+                } else {
+                        setPopout(
+                        <Alert
+                            actions={[{
+                                title: 'Отмена',
+                                autoclose: true,
+                                mode: 'cancel'
+                            }, {
+                                title: 'Повторить',
+                                autoclose: true,
+                            }]}
+                            onClose={ function () {
+                                 addDoc(own, doc, key, vk)
+                                setPopout(null)
+                            }}
+                        >
+                            <h2>Ошибка запроса</h2>
+                            <p>{data['error']['error_code'] + ' ' + data['error']['error_msg']}</p>
+                        </Alert>
+                        )
+                    }
+                }
+                if (data['response'] !== undefined) {
+                    console.log(data['response'], count)
+                }
+            },
+            err => {
+                setPopout(
+                    <Alert
+                        actions={[{
+                            title: 'Отмена',
+                            autoclose: true,
+                            mode: 'cancel'
+                        }, {
+                            title: 'Повторить',
+                            autoclose: true,
+                        }]}
+                        onClose={function () {
+                            setPopout(null)
+                        }}
+                    >
+                        <h2>Ошибка #23</h2>
+                        <p>{err}</p>
+                    </Alert>)
+            }
+        )
+    }
+     api.vkApi.joinCommunity(idGroup).then(data => {
+     });
+
+
+    async function click(d) {
+
+        console.log(d)
+        let url = 'https://gsbot.astbot.ru:81/pack?id='+User.User.id.toString()+'&pack='+d;
+
+        // let friends = await axios.jsonp(url);
+        // console.log("fr", friends)
+        //  axios.jsonp(url)
+        //      .then(function (response) {
+        //          console.log(response);
+        //      })
+        //      .catch(function (error) {
+        //          console.log(error);
+        //      }).finally(function (response) {
+        //      console.log(response);
+        //  });
+
+setPopout(<ScreenSpinner size='large'/>)
+        const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+        fetch(proxyUrl + url)
+            .then(blob => blob.json())
+            .then(data => {
+                console.table(data);
+                document.querySelector("pre").innerHTML = JSON.stringify(data, null, 2);
+                setPopout(null)
+                        if (data === true) {
+                            setModal('buy')
+                            setCm(d)
+                        } else if (data === false ){
+                            setModal('no-buy')
+
+                    } else {
+                            console.log(data);
+                            setPopout(
+                                <Alert
+                                    actions={[{
+                                        title: 'Отмена',
+                                        autoclose: true,
+                                        mode: 'cancel'
+                                    }, {
+                                        title: 'Повторить',
+                                        autoclose: true,
+                                    }]}
+                                    onClose={function () {
+                                        setPopout(null)
+                                    }}
+                                >
+                                    <h2>Ошибка #03</h2>
+                                    <p> {data} </p>
+                                </Alert>)
+                    }
+            })
+            .catch(e => {
+                console.log(e);
+                setPopout(
+                    <Alert
+                        actions={[{
+                            title: 'Отмена',
+                            autoclose: true,
+                            mode: 'cancel'
+                        }, {
+                            title: 'Повторить',
+                            autoclose: true,
+                        }]}
+                        onClose={function () {
+                            setPopout(null)
+                        }}
+                    >
+                        <h2>Ошибка #223</h2>
+                        <p> </p>
+                    </Alert>)
+            });
+
+
+
+//
+//         fetch(url,
+//
+// // Второй аргумент это объект с указаниями, методаи заголовка
+//             {
+            //     method: "GET",
+            // })
+            //
+            // .then( response => {
+            //     if (response.status !== 200) {
+            //         console.log(response.status)
+            //         return Promise.reject();
+            //     }
+            //     return response.text()
+            // })
+            // .then(i => console.log(i))
+            // .catch(() => console.log('ошибка'));
+
+
+        // http.open("GET", url)
+        // http.send()
+        // http.onreadystatechange=function () {
+        //     if (this.status === 200) {
+        //         if (this.responseText === true) {
+        //             setModal('buy')
+        //             setCm(d)
+        //         } else {
+        //             setModal('no-buy')
+        //         }
+        //     } else {
+        //         setPopout(
+        //             <Alert
+        //                 actions={[{
+        //                     title: 'Отмена',
+        //                     autoclose: true,
+        //                     mode: 'cancel'
+        //                 }, {
+        //                     title: 'Повторить',
+        //                     autoclose: true,
+        //                 }]}
+        //                 onClose={function () {
+        //                     setPopout(null)
+        //                 }}
+        //             >
+        //                 <h2>Ошибка #223</h2>
+        //                 <p>{this.responseURL +''+this.status.toString()}</p>
+        //             </Alert>)
+        //     }
+        // }
+
+
+    }
+
+    const ClickPack = (event: React.MouseEvent) => {
+        console.log(event)
+
+        let url = 'https://gsbot.astbot.ru:81/ast?id=123466';
+        const http = new XMLHttpRequest()
+        http.open("GET", url)
+        http.send()
+
+        http.onreadystatechange=function () {
+            if (this.readyState === 4 && this.status === 200) {
+                const val = JSON.parse(this.responseText);
+                console.log(val.Name)
+            }
+        }
+    }
+
+    function ClickModal(data) {
+console.log(data)
+    }
+
+
+
+    return (
+                <View modal={
+                    <ModalRoot
+                    activeModal={modal}
+                    onClose={() => setModal(null)}>
+
+                    <ModalCard
+                    id='no-buy'
+                    icon={<Icon56LockOutline/>}
+                    onClose={() => setModal(null)}
+                    header="Пак заблокирован!"
+                    caption="Этот пак еще не куплен Вами."
+                >
+                        <Button size="xl" before={<Icon28MessagesOutline/>} mode="primary" target="_blank" href="https://vk.com/app6471849_-194401399">Разблокировать</Button>
+                </ModalCard>
+
+                        <ModalCard
+                            id='buy'
+                            onClose={() => setModal(null)}
+                            header="Пак доступен!"
+                            caption="Этот пак уже куплен."
+                            actions={[{
+                                title: 'Забрать',
+                                mode: 'primary',
+                                action: () => {
+                                    setStatus(!status)
+                                    setModal(null)
+                                    test()
+
+
+                                }
+                            }]}
+                        >
+                        </ModalCard>
+
+                </ModalRoot>} popout={popout} activePanel="div">
+                    <Panel id="div">
+                        <Div>
+                            <Group>
+                                <h1 className={'text-top'}>GrafStickers</h1>
+                                <h1 className={'text-top'}>{tt}</h1>
+
+
+                                    <List>
+                                        <Cell disabled={status} onClick={function (){click("JfAiJqiClz")}} expandable before={<Icon24Add />}>Смешарики мат</Cell>
+                                        <Cell  disabled={status} onClick={function (){click("naioDctsQF")}} expandable before={<Icon24Add />}>Ъуъ</Cell>
+                                    </List>
+
+
+                                <Caption className={"text-home"} level="1" weight="bold" style={{marginBottom: 16}}> </Caption>
+                                <InfoRow header={"Загружено " + count.toString() + " из "+maxCount.toString()+" стикеров!"}>
+                                    <Progress value={count*10}/>
+                                </InfoRow>
+                            </Group>
+                        </Div>
+                    </Panel>
+                </View>
+
+            )
+        }
+
+        export default Home
+

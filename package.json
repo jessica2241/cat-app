@@ -1,0 +1,49 @@
+{
+  "name": "cat-app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@babel/runtime": "7.5.5",
+    "@testing-library/dom": "^7.5.6",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "@vkontakte/icons": "1.20.2",
+    "@vkontakte/vk-bridge": "^2.2.1",
+    "@vkontakte/vk-mini-apps-api": "^0.6.5",
+    "@vkontakte/vk-miniapps-deploy": "^0.0.17",
+    "@vkontakte/vkui": "^3.9.2",
+    "axios-jsonp-pro": "^1.1.8",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.2",
+    "easyvk": "^2.7.1",
+    "fs": "^0.0.1-security",
+    "prop-types": "15.6.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-scripts": "3.4.1",
+    "typescript": "^3.9.2",
+    "vk-io": "^4.0.0-rc.30",
+    "vkui": "^1.1.1"
+  },
+  "scripts": {
+    "start": "cross-env PORT=10888 HTTPS=true react-scripts start",
+    "build": "react-scripts build",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
